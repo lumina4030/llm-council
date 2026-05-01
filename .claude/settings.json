@@ -1,0 +1,31 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npm *)",
+      "Bash(npx *)",
+      "Bash(npx prisma *)",
+      "Bash(cd *)",
+      "Bash(ls *)",
+      "Bash(mkdir *)",
+      "Bash(mv *)",
+      "Bash(cp *)",
+      "Bash(cat *)",
+      "Bash(grep *)",
+      "Bash(find *)",
+      "Bash(write *)",
+      "Bash(vitest *)",
+      "Bash(node *)",
+      "Bash(tsc *)",
+      "Bash(jest *)",
+      "Bash(rm *)",
+      "Bash(touch *)",
+      "Bash(echo *)",
+      "Bash(ps *)",
+      "Bash(kill *)",
+      "Read",
+      "Write",
+      "Edit",
+      "NotebookEdit"
+    ]
+  }
+}
