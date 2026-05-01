@@ -6,6 +6,32 @@ import { Plus } from "lucide-react";
 import { ProjectList } from "@/components/projects/ProjectList";
 import { CreateProjectModal } from "@/components/projects/CreateProjectModal";
 
+function LoadingSkeleton() {
+  return (
+    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+      {[1, 2, 3].map((i) => (
+        <div
+          key={i}
+          className="bg-white dark:bg-gray-800 rounded-2xl p-6 shadow-md"
+        >
+          <div className="flex justify-between items-start mb-4">
+            <div className="skeleton h-6 w-3/4 rounded-lg" />
+            <div className="skeleton h-5 w-16 rounded-full" />
+          </div>
+          <div className="space-y-3">
+            <div className="skeleton h-4 w-full rounded" />
+            <div className="skeleton h-4 w-2/3 rounded" />
+          </div>
+          <div className="flex gap-2 mt-4">
+            <div className="skeleton h-8 w-20 rounded-lg" />
+            <div className="skeleton h-8 w-16 rounded-lg" />
+          </div>
+        </div>
+      ))}
+    </div>
+  );
+}
+
 export default function HomePage() {
   const [projects, setProjects] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -54,28 +80,42 @@ export default function HomePage() {
   };
 
   return (
-    <div className="container mx-auto px-4 py-8 max-w-6xl">
-      <div className="flex justify-between items-center mb-8">
-        <div>
-          <h1 className="text-3xl font-bold">Projects</h1>
-          <p className="text-gray-500 mt-1">
-            Create and manage your PRD generation projects
-          </p>
+    <div className="min-h-screen">
+      {/* Hero Section */}
+      <div className="relative overflow-hidden">
+        <div className="absolute inset-0 gradient-bg-soft" />
+        <div className="absolute inset-0 bg-gradient-to-b from-transparent to-background/50" />
+        <div className="relative container mx-auto px-4 py-12 max-w-6xl">
+          <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6 animate-fade-in-up">
+            <div>
+              <h1 className="text-4xl md:text-5xl font-bold mb-3">
+                <span className="gradient-text">Your Projects</span>
+              </h1>
+              <p className="text-lg text-default-500 max-w-lg">
+                Create and manage your PRD generation projects with AI-powered multi-agent collaboration
+              </p>
+            </div>
+            <button
+              onClick={() => setIsModalOpen(true)}
+              className="group flex items-center gap-2 px-6 py-3 rounded-2xl btn-gradient text-white shadow-xl hover:shadow-2xl hover:-translate-y-1 transition-all duration-300"
+            >
+              <Plus size={20} className="group-hover:rotate-90 transition-transform duration-300" />
+              <span className="font-semibold">New Project</span>
+            </button>
+          </div>
         </div>
-        <button
-          onClick={() => setIsModalOpen(true)}
-          className="flex items-center gap-2 px-4 py-2 bg-warning-500 text-white rounded-lg hover:bg-warning-600 transition-colors"
-        >
-          <Plus size={20} />
-          New Project
-        </button>
       </div>
 
-      {isLoading ? (
-        <div className="text-center py-12 text-gray-500">Loading...</div>
-      ) : (
-        <ProjectList projects={projects} onDelete={handleDelete} />
-      )}
+      {/* Projects Section */}
+      <div className="container mx-auto px-4 py-8 max-w-6xl">
+        {isLoading ? (
+          <LoadingSkeleton />
+        ) : (
+          <div className="stagger-children">
+            <ProjectList projects={projects} onDelete={handleDelete} />
+          </div>
+        )}
+      </div>
 
       <CreateProjectModal
         isOpen={isModalOpen}

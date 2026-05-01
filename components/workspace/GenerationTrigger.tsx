@@ -1,6 +1,6 @@
 "use client";
 
-import { Play } from "lucide-react";
+import { Play, Square } from "lucide-react";
 import type { Agent } from "@/types";
 import { useState } from "react";
 
@@ -58,20 +58,29 @@ export function GenerationTrigger({
         type="button"
         onClick={handleGenerate}
         disabled={isGenerating}
-        className="w-full px-6 py-3 text-lg font-medium rounded-lg bg-warning-500 text-white hover:bg-warning-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+        className="w-full px-6 py-4 text-base font-bold rounded-2xl btn-gradient text-white shadow-xl hover:shadow-2xl hover:-translate-y-1 transition-all duration-300 disabled:opacity-70 disabled:cursor-not-allowed flex items-center justify-center gap-3"
       >
-        <Play size={20} />
-        {isGenerating ? "Generating..." : "Start Generation"}
+        {isGenerating ? (
+          <>
+            <div className="w-5 h-5 border-3 border-white/30 border-t-white rounded-full animate-spin" />
+            <span>Generating...</span>
+          </>
+        ) : (
+          <>
+            <Play size={20} className="fill-white" />
+            <span>Start Generation</span>
+          </>
+        )}
       </button>
       {isGenerating && (
-        <div className="space-y-2">
-          <div className="h-2 bg-gray-200 rounded-full overflow-hidden">
+        <div className="space-y-3">
+          <div className="h-2.5 bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden shadow-inner">
             <div
-              className="h-full bg-warning-500 transition-all duration-300"
+              className="h-full bg-gradient-to-r from-purple-500 via-pink-500 to-warning-500 transition-all duration-500 ease-out rounded-full"
               style={{ width: `${progress}%` }}
             />
           </div>
-          <p className="text-sm text-center text-default-500">{Math.round(progress)}% complete</p>
+          <p className="text-sm text-center text-default-500 font-medium">{Math.round(progress)}% complete</p>
         </div>
       )}
     </div>

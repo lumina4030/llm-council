@@ -89,68 +89,77 @@ export function CreateProjectModal({ isOpen, onClose, onCreate }: CreateProjectM
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
-      <div className="bg-white dark:bg-gray-800 rounded-xl shadow-xl w-full max-w-2xl max-h-[90vh] overflow-auto">
-        <div className="p-6 border-b border-gray-200 dark:border-gray-700">
-          <h2 className="text-xl font-bold">Create New Project</h2>
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+      <div
+        className="absolute inset-0 bg-black/40 backdrop-blur-sm"
+        onClick={onClose}
+      />
+      <div className="relative bg-white/95 dark:bg-gray-800/95 backdrop-blur-xl rounded-2xl shadow-2xl w-full max-w-2xl max-h-[90vh] overflow-auto border border-gray-200/50 dark:border-gray-700/50 animate-fade-in-up">
+        <div className="p-6 border-b border-gray-200/50 dark:border-gray-700/50">
+          <h2 className="text-xl font-bold gradient-text">Create New Project</h2>
         </div>
-        <div className="p-6 space-y-4">
+        <div className="p-6 space-y-5">
           <div>
-            <label className="block text-sm font-medium mb-1">Project Title</label>
+            <label className="block text-sm font-medium mb-2">Project Title</label>
             <input
               type="text"
               value={title}
               onChange={(e) => setTitle(e.target.value)}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg dark:bg-gray-700 dark:border-gray-600"
+              className="w-full px-4 py-2.5 border border-gray-300 dark:border-gray-600 rounded-xl dark:bg-gray-900/50 focus:ring-2 focus:ring-warning-500/50 focus:border-warning-500 transition-all"
               placeholder="Enter project title"
             />
           </div>
           <div>
-            <label className="block text-sm font-medium mb-1">Product Idea</label>
+            <label className="block text-sm font-medium mb-2">Product Idea</label>
             <textarea
               value={idea}
               onChange={(e) => setIdea(e.target.value)}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg dark:bg-gray-700 dark:border-gray-600 min-h-[100px]"
+              className="w-full px-4 py-2.5 border border-gray-300 dark:border-gray-600 rounded-xl dark:bg-gray-900/50 min-h-[100px] focus:ring-2 focus:ring-warning-500/50 focus:border-warning-500 transition-all"
               placeholder="Describe your product idea..."
             />
           </div>
           <div>
-            <label className="block text-sm font-medium mb-1">Document Type</label>
+            <label className="block text-sm font-medium mb-2">Document Type</label>
             <select
               value={docType}
               onChange={(e) => setDocType(e.target.value)}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg dark:bg-gray-700 dark:border-gray-600"
+              className="w-full px-4 py-2.5 border border-gray-300 dark:border-gray-600 rounded-xl dark:bg-gray-900/50 focus:ring-2 focus:ring-warning-500/50 focus:border-warning-500 transition-all"
             >
               <option value="prd">PRD (Product Requirements Document)</option>
               <option value="spec">Technical Spec</option>
             </select>
           </div>
 
-          <div className="space-y-4 mt-4">
+          <div className="space-y-4 pt-2">
             <div className="flex justify-between items-center">
-              <h4 className="font-semibold">Writers ({agents.filter(a => a.role === "writer").length})</h4>
+              <h4 className="font-semibold flex items-center gap-2">
+                <span className="px-2 py-1 text-xs font-medium rounded-lg bg-warning-100 text-warning-700 dark:bg-warning-900/50 dark:text-warning-300">
+                  {agents.filter(a => a.role === "writer").length}
+                </span>
+                Writers
+              </h4>
               <button
                 type="button"
                 onClick={() => addAgent("writer")}
-                className="inline-flex items-center gap-1 px-3 py-1.5 text-sm font-medium rounded-lg bg-warning-500 text-white hover:bg-warning-600 transition-colors"
+                className="inline-flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium rounded-xl bg-gradient-to-r from-purple-500 to-pink-500 text-white hover:shadow-lg hover:-translate-y-0.5 transition-all duration-300"
               >
                 <Plus size={16} />
                 Add Writer
               </button>
             </div>
             {agents.filter(a => a.role === "writer").map((agent) => (
-              <div key={agent.id} className="flex gap-2 items-center">
+              <div key={agent.id} className="flex gap-2 items-center p-3 bg-gray-50 dark:bg-gray-900/50 rounded-xl">
                 <input
                   type="text"
                   placeholder="Agent name"
                   value={agent.name}
                   onChange={(e) => updateAgent(agent.id, { name: e.target.value })}
-                  className="flex-1 px-3 py-2 border border-gray-300 rounded dark:bg-gray-700 dark:border-gray-600 text-sm"
+                  className="flex-1 px-3 py-2 border border-gray-300 rounded-lg dark:bg-gray-800 dark:border-gray-600 text-sm focus:ring-2 focus:ring-warning-500/50 focus:border-warning-500 transition-all"
                 />
                 <select
                   value={agent.model}
                   onChange={(e) => updateAgent(agent.id, { model: e.target.value })}
-                  className="w-48 px-3 py-2 border border-gray-300 rounded dark:bg-gray-700 dark:border-gray-600 text-sm"
+                  className="w-40 px-3 py-2 border border-gray-300 rounded-lg dark:bg-gray-800 dark:border-gray-600 text-sm focus:ring-2 focus:ring-warning-500/50 focus:border-warning-500 transition-all"
                 >
                   {MODEL_OPTIONS.map((m) => (
                     <option key={m.key} value={m.key}>{m.label}</option>
@@ -160,37 +169,42 @@ export function CreateProjectModal({ isOpen, onClose, onCreate }: CreateProjectM
                   type="button"
                   onClick={() => removeAgent(agent.id)}
                   disabled={agents.filter(a => a.role === "writer").length <= 2}
-                  className="p-1.5 text-danger hover:bg-danger-100 rounded transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="p-2 text-danger hover:bg-danger-100 dark:hover:bg-danger-900/30 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   <Trash2 size={16} />
                 </button>
               </div>
             ))}
 
-            <div className="flex justify-between items-center mt-4">
-              <h4 className="font-semibold">Reviewers ({agents.filter(a => a.role === "reviewer").length})</h4>
+            <div className="flex justify-between items-center mt-6">
+              <h4 className="font-semibold flex items-center gap-2">
+                <span className="px-2 py-1 text-xs font-medium rounded-lg bg-success-100 text-success-700 dark:bg-success-900/50 dark:text-success-300">
+                  {agents.filter(a => a.role === "reviewer").length}
+                </span>
+                Reviewers
+              </h4>
               <button
                 type="button"
                 onClick={() => addAgent("reviewer")}
-                className="inline-flex items-center gap-1 px-3 py-1.5 text-sm font-medium rounded-lg bg-warning-500 text-white hover:bg-warning-600 transition-colors"
+                className="inline-flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium rounded-xl bg-gradient-to-r from-green-500 to-emerald-500 text-white hover:shadow-lg hover:-translate-y-0.5 transition-all duration-300"
               >
                 <Plus size={16} />
                 Add Reviewer
               </button>
             </div>
             {agents.filter(a => a.role === "reviewer").map((agent) => (
-              <div key={agent.id} className="flex gap-2 items-center">
+              <div key={agent.id} className="flex gap-2 items-center p-3 bg-gray-50 dark:bg-gray-900/50 rounded-xl">
                 <input
                   type="text"
                   placeholder="Agent name"
                   value={agent.name}
                   onChange={(e) => updateAgent(agent.id, { name: e.target.value })}
-                  className="flex-1 px-3 py-2 border border-gray-300 rounded dark:bg-gray-700 dark:border-gray-600 text-sm"
+                  className="flex-1 px-3 py-2 border border-gray-300 rounded-lg dark:bg-gray-800 dark:border-gray-600 text-sm focus:ring-2 focus:ring-warning-500/50 focus:border-warning-500 transition-all"
                 />
                 <select
                   value={agent.model}
                   onChange={(e) => updateAgent(agent.id, { model: e.target.value })}
-                  className="w-48 px-3 py-2 border border-gray-300 rounded dark:bg-gray-700 dark:border-gray-600 text-sm"
+                  className="w-40 px-3 py-2 border border-gray-300 rounded-lg dark:bg-gray-800 dark:border-gray-600 text-sm focus:ring-2 focus:ring-warning-500/50 focus:border-warning-500 transition-all"
                 >
                   {MODEL_OPTIONS.map((m) => (
                     <option key={m.key} value={m.key}>{m.label}</option>
@@ -200,7 +214,7 @@ export function CreateProjectModal({ isOpen, onClose, onCreate }: CreateProjectM
                   type="button"
                   onClick={() => removeAgent(agent.id)}
                   disabled={agents.filter(a => a.role === "reviewer").length <= 1}
-                  className="p-1.5 text-danger hover:bg-danger-100 rounded transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="p-2 text-danger hover:bg-danger-100 dark:hover:bg-danger-900/30 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   <Trash2 size={16} />
                 </button>
@@ -208,11 +222,11 @@ export function CreateProjectModal({ isOpen, onClose, onCreate }: CreateProjectM
             ))}
           </div>
         </div>
-        <div className="p-6 border-t border-gray-200 dark:border-gray-700 flex justify-end gap-2">
+        <div className="p-6 border-t border-gray-200/50 dark:border-gray-700/50 flex justify-end gap-3">
           <button
             type="button"
             onClick={onClose}
-            className="px-4 py-2 text-sm font-medium rounded-lg text-default-600 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+            className="px-5 py-2.5 text-sm font-medium rounded-xl text-default-600 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
           >
             Cancel
           </button>
@@ -220,7 +234,7 @@ export function CreateProjectModal({ isOpen, onClose, onCreate }: CreateProjectM
             type="button"
             onClick={handleSubmit}
             disabled={isLoading}
-            className="px-4 py-2 text-sm font-medium rounded-lg bg-warning-500 text-white hover:bg-warning-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+            className="px-5 py-2.5 text-sm font-medium rounded-xl btn-gradient text-white shadow-lg hover:shadow-xl hover:-translate-y-0.5 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
           >
             {isLoading ? "Creating..." : "Create Project"}
           </button>
