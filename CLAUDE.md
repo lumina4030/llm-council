@@ -52,3 +52,17 @@ npm run build  # Production build
 - Button component uses `variant` (primary/secondary/soft/ghost/outline/tertiary) not `color`
 - Use standard HTML elements with Tailwind for HeroUI compatibility issues
 - BlockNote `useCreateBlockNote` for editor initialization
+---
+
+## 2026-05-01 Implementation Notes
+
+### Completed
+- Multi-agent PRD/Spec generator with parallel Writer + Reviewer
+- 52 unit tests passing
+- Deployed to Vercel: https://llm-council-green.vercel.app
+- GitHub: https://github.com/lumina4030/llm-council
+
+### Important Lesson
+Coding agent does NOT automatically commit to git. After implementation:
+1. `git add -A && git commit -m "..." && git push`
+2. Verify GitHub has the latest code before declaring done
