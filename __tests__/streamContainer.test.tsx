@@ -67,18 +67,22 @@ describe('StreamContainer', () => {
 
   describe('agent role display', () => {
     it('should display writer role correctly', () => {
-      const { getByText } = render(
+      const { container } = render(
         <StreamContainer agent={mockAgent} progress="pending" />
       );
-      expect(getByText('writer')).toBeDefined();
+      // Check for writer role badge with emoji
+      expect(container.innerHTML).toContain('🤖');
+      expect(container.innerHTML).toContain('writer');
     });
 
     it('should display reviewer role correctly', () => {
-      const reviewer: Agent = { ...mockAgent, name: 'Reviewer', role: 'reviewer' };
-      const { getByText } = render(
+      const reviewer: Agent = { ...mockAgent, name: 'Review Test', role: 'reviewer' };
+      const { container } = render(
         <StreamContainer agent={reviewer} progress="pending" />
       );
-      expect(getByText('reviewer')).toBeDefined();
+      // Check for reviewer role badge with emoji
+      expect(container.innerHTML).toContain('🔍');
+      expect(container.innerHTML).toContain('reviewer');
     });
 
     it('should display agent name', () => {
@@ -86,6 +90,48 @@ describe('StreamContainer', () => {
         <StreamContainer agent={mockAgent} progress="pending" />
       );
       expect(getByText('Test Writer')).toBeDefined();
+    });
+
+    it('should display agent model', () => {
+      const { getByText } = render(
+        <StreamContainer agent={mockAgent} progress="pending" />
+      );
+      expect(getByText('(gpt-4o)')).toBeDefined();
+    });
+  });
+
+  describe('retry functionality', () => {
+    it('should show retry button on error state', () => {
+      const onRetry = () => {};
+      const { getByText } = render(
+        <StreamContainer agent={mockAgent} progress="error" onRetry={onRetry} />
+      );
+      expect(getByText(/Retry.*Test Writer/)).toBeDefined();
+    });
+
+    it('should show error message when provided', () => {
+      const { getByText } = render(
+        <StreamContainer agent={mockAgent} progress="error" errorMsg="Connection timeout" />
+      );
+      expect(getByText('Connection timeout')).toBeDefined();
+    });
+  });
+
+  describe('action buttons', () => {
+    it('should show Edit and Copy buttons when done with content', () => {
+      const onEdit = () => {};
+      const onCopy = () => {};
+      const { getByText } = render(
+        <StreamContainer
+          agent={mockAgent}
+          progress="done"
+          content="Test content"
+          onEdit={onEdit}
+          onCopy={onCopy}
+        />
+      );
+      expect(getByText('Edit')).toBeDefined();
+      expect(getByText('Copy MD')).toBeDefined();
     });
   });
 });
