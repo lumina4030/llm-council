@@ -9,7 +9,7 @@ export const CreateProjectSchema = z.object({
       z.object({
         name: z.string().min(1),
         role: z.enum(["writer", "reviewer"]),
-        model: z.string().min(1),
+        model: z.string(),
         providerId: z.string().optional(),
       })
     )

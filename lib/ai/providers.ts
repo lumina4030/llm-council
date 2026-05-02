@@ -7,6 +7,7 @@ export interface ProviderConfig {
   name: string;
   apiBase: string;
   apiKey: string;
+  model?: string;
 }
 
 const providerCache: Record<string, ReturnType<typeof createOpenAI>> = {};

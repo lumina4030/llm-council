@@ -124,6 +124,7 @@ export default function ProjectPage() {
             name: provider.name,
             apiBase: provider.apiBase,
             apiKey: provider.apiKey,
+            model: writer.model || "gpt-4o",
           },
         }),
       });
@@ -187,6 +188,7 @@ export default function ProjectPage() {
               name: provider.name,
               apiBase: provider.apiBase,
               apiKey: provider.apiKey,
+              model: writer.model || "gpt-4o",
             },
           }),
         });
@@ -249,6 +251,7 @@ export default function ProjectPage() {
             name: provider.name,
             apiBase: provider.apiBase,
             apiKey: provider.apiKey,
+            model: reviewer.model || "gpt-4o",
           },
         }),
       });

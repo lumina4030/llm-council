@@ -50,7 +50,7 @@ export async function POST(
 
     let model;
     if (providerConfig) {
-      model = getModelForProvider(providerConfig, agent.model);
+      model = getModelForProvider(providerConfig, providerConfig.model || agent.model);
     } else {
       throw new Error("No provider configuration provided");
     }

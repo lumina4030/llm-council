@@ -58,7 +58,7 @@ export async function POST(
       };
     });
 
-    const model = getModelForProvider(providerConfig, reviewer.model);
+    const model = getModelForProvider(providerConfig, providerConfig.model || reviewer.model);
 
     const result = await generateObject({
       model,
