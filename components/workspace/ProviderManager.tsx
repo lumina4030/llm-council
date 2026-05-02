@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { Card } from "@heroui/react";
-import { Plus, Trash2, Settings, X, Eye, EyeOff } from "lucide-react";
+import { Plus, Trash2, Settings, X, Eye, EyeOff, Plug, Loader2, CheckCircle, XCircle } from "lucide-react";
 import { useProjectStore } from "@/store/projectStore";
 import type { Provider } from "@/types";
 
@@ -11,11 +11,15 @@ interface ProviderManagerProps {
   onClose: () => void;
 }
 
+type TestStatus = "idle" | "loading" | "success" | "error";
+
 export function ProviderManager({ isOpen, onClose }: ProviderManagerProps) {
   const { providers, addProvider, removeProvider, updateProvider } = useProjectStore();
   const [showKey, setShowKey] = useState<Record<string, boolean>>({});
   const [editingId, setEditingId] = useState<string | null>(null);
   const [form, setForm] = useState<Partial<Provider>>({});
+  const [testStatus, setTestStatus] = useState<Record<string, TestStatus>>({});
+  const [testMessage, setTestMessage] = useState<Record<string, string>>({});
 
   if (!isOpen) return null;
 
@@ -53,6 +57,36 @@ export function ProviderManager({ isOpen, onClose }: ProviderManagerProps) {
   const maskKey = (key: string) => {
     if (key.length <= 8) return "***";
     return key.slice(0, 4) + "***" + key.slice(-4);
+  };
+
+  const handleTestConnection = async (p: Provider) => {
+    setTestStatus((prev) => ({ ...prev, [p.id]: "loading" }));
+    setTestMessage((prev) => ({ ...prev, [p.id]: "" }));
+
+    try {
+      const res = await fetch("/api/providers/test", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          apiBase: p.apiBase,
+          apiKey: p.apiKey,
+          model: p.name.toLowerCase().includes("openai") ? "gpt-4o" : undefined,
+        }),
+      });
+
+      const data = await res.json();
+
+      if (data.success) {
+        setTestStatus((prev) => ({ ...prev, [p.id]: "success" }));
+        setTestMessage((prev) => ({ ...prev, [p.id]: data.message }));
+      } else {
+        setTestStatus((prev) => ({ ...prev, [p.id]: "error" }));
+        setTestMessage((prev) => ({ ...prev, [p.id]: data.error }));
+      }
+    } catch (err) {
+      setTestStatus((prev) => ({ ...prev, [p.id]: "error" }));
+      setTestMessage((prev) => ({ ...prev, [p.id]: err instanceof Error ? err.message : "Connection failed" }));
+    }
   };
 
   return (
@@ -152,6 +186,18 @@ export function ProviderManager({ isOpen, onClose }: ProviderManagerProps) {
                     </div>
                     <div className="flex gap-2">
                       <button
+                        onClick={() => handleTestConnection(p)}
+                        disabled={testStatus[p.id] === "loading"}
+                        className="px-3 py-1.5 text-xs font-medium rounded-lg bg-purple-100 text-purple-700 dark:bg-purple-900/50 dark:text-purple-300 hover:bg-purple-200 dark:hover:bg-purple-800/50 transition-colors disabled:opacity-50 flex items-center gap-1"
+                      >
+                        {testStatus[p.id] === "loading" ? (
+                          <Loader2 size={12} className="animate-spin" />
+                        ) : (
+                          <Plug size={12} />
+                        )}
+                        Test
+                      </button>
+                      <button
                         onClick={() => startEdit(p)}
                         className="px-3 py-1.5 text-xs font-medium rounded-lg bg-warning-100 text-warning-700 dark:bg-warning-900/50 dark:text-warning-300 hover:bg-warning-200 dark:hover:bg-warning-800/50 transition-colors"
                       >
@@ -165,6 +211,22 @@ export function ProviderManager({ isOpen, onClose }: ProviderManagerProps) {
                       </button>
                     </div>
                   </div>
+                  {testStatus[p.id] === "success" && testMessage[p.id] && (
+                    <div className="mt-3 p-2 bg-green-50 dark:bg-green-900/20 rounded-lg border border-green-200 dark:border-green-800">
+                      <p className="text-xs text-green-700 dark:text-green-300 flex items-center gap-1">
+                        <CheckCircle size={12} />
+                        {testMessage[p.id]}
+                      </p>
+                    </div>
+                  )}
+                  {testStatus[p.id] === "error" && testMessage[p.id] && (
+                    <div className="mt-3 p-2 bg-red-50 dark:bg-red-900/20 rounded-lg border border-red-200 dark:border-red-800">
+                      <p className="text-xs text-red-700 dark:text-red-300 flex items-center gap-1">
+                        <XCircle size={12} />
+                        {testMessage[p.id]}
+                      </p>
+                    </div>
+                  )}
                 </Card>
               ))}
             </div>
