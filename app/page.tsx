@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { Toast } from "@heroui/react";
+import { toast } from "@heroui/react";
 import { Plus, Settings } from "lucide-react";
 import { ProjectList } from "@/components/projects/ProjectList";
 import { CreateProjectModal } from "@/components/projects/CreateProjectModal";
@@ -68,7 +68,7 @@ export default function HomePage() {
       const data = await res.json();
       setProjects(data.projects);
     } catch {
-      Toast.toast.danger("Failed to load projects");
+      toast.danger("Failed to load projects");
     } finally {
       setIsLoading(false);
     }
@@ -87,7 +87,7 @@ export default function HomePage() {
       });
       if (!res.ok) throw new Error("Failed to create");
       await fetchProjects();
-      Toast.toast.success("Project created");
+      toast.success("Project created");
     } catch (error) {
       throw error;
     }
@@ -97,9 +97,9 @@ export default function HomePage() {
     try {
       await fetch(`/api/projects/${id}`, { method: "DELETE" });
       await fetchProjects();
-      Toast.toast.success("Project deleted");
+      toast.success("Project deleted");
     } catch {
-      Toast.toast.danger("Failed to delete project");
+      toast.danger("Failed to delete project");
     }
   };
 

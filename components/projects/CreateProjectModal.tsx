@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Toast } from "@heroui/react";
+import { toast } from "@heroui/react";
 import { Plus, Trash2, Settings } from "lucide-react";
 import { useProjectStore } from "@/store/projectStore";
 import { ProviderManager } from "@/components/workspace/ProviderManager";
@@ -57,7 +57,7 @@ export function CreateProjectModal({ isOpen, onClose, onCreate }: CreateProjectM
 
   const handleSubmit = async () => {
     if (!title.trim() || !idea.trim()) {
-      Toast.toast.danger("Please fill in all fields");
+      toast.danger("Please fill in all fields");
       return;
     }
 
@@ -65,11 +65,11 @@ export function CreateProjectModal({ isOpen, onClose, onCreate }: CreateProjectM
     const reviewerCount = agents.filter(a => a.role === "reviewer").length;
 
     if (writerCount < 2) {
-      Toast.toast.danger("At least 2 writers required");
+      toast.danger("At least 2 writers required");
       return;
     }
     if (reviewerCount < 1) {
-      Toast.toast.danger("At least 1 reviewer required");
+      toast.danger("At least 1 reviewer required");
       return;
     }
 
@@ -81,7 +81,7 @@ export function CreateProjectModal({ isOpen, onClose, onCreate }: CreateProjectM
       setIdea("");
       setDocType("prd");
     } catch (error) {
-      Toast.toast.danger("Failed to create project");
+      toast.danger("Failed to create project");
     } finally {
       setIsLoading(false);
     }
@@ -261,7 +261,7 @@ export function CreateProjectModal({ isOpen, onClose, onCreate }: CreateProjectM
             <button
               type="button"
               onClick={handleSubmit}
-              disabled={isLoading || providers.length === 0}
+              disabled={isLoading}
               className="px-5 py-2.5 text-sm font-medium rounded-xl btn-gradient text-white shadow-lg hover:shadow-xl hover:-translate-y-0.5 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {isLoading ? "Creating..." : "Create Project"}
