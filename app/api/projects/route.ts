@@ -34,6 +34,7 @@ export async function POST(req: NextRequest) {
             name: agent.name,
             role: agent.role,
             model: agent.model,
+            providerId: agent.providerId || null,
           })),
         },
       },

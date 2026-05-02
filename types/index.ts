@@ -1,3 +1,16 @@
+export interface Provider {
+  id: string;
+  name: string;
+  apiBase: string;
+  apiKey: string;
+}
+
+export interface ProviderWithModel extends Provider {
+  models: string[];
+}
+
+export type WriterProgress = "pending" | "streaming" | "done" | "error";
+
 export interface Project {
   id: string;
   title: string;
@@ -17,6 +30,7 @@ export interface Agent {
   name: string;
   role: string;
   model: string;
+  providerId?: string;
 }
 
 export interface Document {
@@ -38,8 +52,6 @@ export interface Review {
   createdAt: Date;
 }
 
-export type WriterProgress = "pending" | "streaming" | "done" | "error";
-
 export interface ProjectState {
   project: Project | null;
   agents: Agent[];
@@ -47,6 +59,7 @@ export interface ProjectState {
   review: Review | null;
   isGenerating: boolean;
   writerProgress: Record<string, WriterProgress>;
+  providers: Provider[];
   setProjectData: (data: {
     project: Project;
     agents: Agent[];
@@ -57,4 +70,7 @@ export interface ProjectState {
   setIsGenerating: (val: boolean) => void;
   updateDocumentContent: (docId: string, content: string) => void;
   reset: () => void;
+  addProvider: (provider: Provider) => void;
+  removeProvider: (id: string) => void;
+  updateProvider: (id: string, updates: Partial<Provider>) => void;
 }

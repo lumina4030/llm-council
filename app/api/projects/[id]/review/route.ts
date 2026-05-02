@@ -1,12 +1,13 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { generateObject } from "ai";
-import { getProviderModel } from "@/lib/ai/providers";
+import { getModelForProvider } from "@/lib/ai/providers";
 import {
   SYSTEM_PROMPT_REVIEWER,
   buildReviewerPrompt,
 } from "@/lib/ai/prompts";
 import { ReviewerOutputSchema } from "@/lib/ai/schemas";
+import type { ProviderConfig } from "@/lib/ai/providers";
 
 export async function POST(
   req: NextRequest,
@@ -14,6 +15,8 @@ export async function POST(
 ) {
   try {
     const { id: projectId } = await params;
+    const body = await req.json().catch(() => ({}));
+    const providerConfig: ProviderConfig | undefined = body.providerConfig;
 
     const project = await prisma.project.findUnique({
       where: { id: projectId },
@@ -42,6 +45,10 @@ export async function POST(
 
     const reviewer = reviewers[0];
 
+    if (!providerConfig) {
+      return NextResponse.json({ error: "No provider configuration provided" }, { status: 400 });
+    }
+
     const docs = project.documents.map((doc) => {
       const agent = project.agents.find((a) => a.id === doc.agentId)!;
       return {
@@ -51,8 +58,10 @@ export async function POST(
       };
     });
 
+    const model = getModelForProvider(providerConfig, reviewer.model);
+
     const result = await generateObject({
-      model: getProviderModel(reviewer.model),
+      model,
       schema: ReviewerOutputSchema,
       system: SYSTEM_PROMPT_REVIEWER,
       prompt: buildReviewerPrompt(project.idea, docs),

@@ -2,9 +2,11 @@
 
 import { useState, useEffect } from "react";
 import { Toast } from "@heroui/react";
-import { Plus } from "lucide-react";
+import { Plus, Settings } from "lucide-react";
 import { ProjectList } from "@/components/projects/ProjectList";
 import { CreateProjectModal } from "@/components/projects/CreateProjectModal";
+import { ProviderManager } from "@/components/workspace/ProviderManager";
+import { useProjectStore } from "@/store/projectStore";
 
 function LoadingSkeleton() {
   return (
@@ -36,6 +38,28 @@ export default function HomePage() {
   const [projects, setProjects] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isProviderModalOpen, setIsProviderModalOpen] = useState(false);
+  const { providers, addProvider, removeProvider, updateProvider } = useProjectStore();
+
+  useEffect(() => {
+    const saved = localStorage.getItem("llm-council-providers");
+    if (saved) {
+      try {
+        const parsed = JSON.parse(saved);
+        parsed.forEach((p: any) => {
+          addProvider(p);
+        });
+      } catch (e) {
+        console.error("Failed to load providers", e);
+      }
+    }
+  }, [addProvider]);
+
+  useEffect(() => {
+    if (providers.length > 0) {
+      localStorage.setItem("llm-council-providers", JSON.stringify(providers));
+    }
+  }, [providers]);
 
   const fetchProjects = async () => {
     try {
@@ -96,6 +120,18 @@ export default function HomePage() {
               </p>
             </div>
             <button
+              onClick={() => setIsProviderModalOpen(true)}
+              className="group flex items-center gap-2 px-4 py-2.5 rounded-xl bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 transition-all border border-gray-200 dark:border-gray-700"
+            >
+              <Settings size={18} />
+              <span className="font-medium text-sm">Providers</span>
+              {providers.length > 0 && (
+                <span className="px-1.5 py-0.5 text-xs rounded-full bg-purple-100 text-purple-700 dark:bg-purple-900/50 dark:text-purple-300">
+                  {providers.length}
+                </span>
+              )}
+            </button>
+            <button
               onClick={() => setIsModalOpen(true)}
               className="group flex items-center gap-2 px-6 py-3 rounded-2xl btn-gradient text-white shadow-xl hover:shadow-2xl hover:-translate-y-1 transition-all duration-300"
             >
@@ -121,6 +157,11 @@ export default function HomePage() {
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
         onCreate={handleCreate}
+      />
+
+      <ProviderManager
+        isOpen={isProviderModalOpen}
+        onClose={() => setIsProviderModalOpen(false)}
       />
     </div>
   );

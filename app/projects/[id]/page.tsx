@@ -22,6 +22,7 @@ export default function ProjectPage() {
     review,
     writerProgress,
     isGenerating,
+    providers,
     setProjectData,
     setWriterProgress,
     setIsGenerating,
@@ -98,6 +99,13 @@ export default function ProjectPage() {
     const writer = writers.find((w) => w.id === writerId);
     if (!writer) return;
 
+    const provider = providers.find((p) => p.id === writer.providerId);
+    if (!provider) {
+      setWriterProgress(writerId, "error");
+      setErrorMessages((prev) => ({ ...prev, [writerId]: "No provider configured" }));
+      return;
+    }
+
     setWriterProgress(writerId, "pending");
     setErrorMessages((prev) => ({ ...prev, [writerId]: "" }));
 
@@ -109,6 +117,15 @@ export default function ProjectPage() {
       const response = await fetch(endpoint, {
         method: "POST",
         signal: abortControllersRef.current[writerId].signal,
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          providerConfig: {
+            id: provider.id,
+            name: provider.name,
+            apiBase: provider.apiBase,
+            apiKey: provider.apiKey,
+          },
+        }),
       });
 
       if (!response.ok) throw new Error(`Stream failed (${response.status})`);
@@ -149,6 +166,13 @@ export default function ProjectPage() {
     handleGenerationStart();
 
     const streams = writers.map(async (writer) => {
+      const provider = providers.find((p) => p.id === writer.providerId);
+      if (!provider) {
+        setWriterProgress(writer.id, "error");
+        setErrorMessages((prev) => ({ ...prev, [writer.id]: "No provider configured" }));
+        return;
+      }
+
       const endpoint = `/api/projects/${projectId}/writer/${writer.id}/stream`;
       setWriterProgress(writer.id, "streaming");
 
@@ -156,6 +180,15 @@ export default function ProjectPage() {
         const response = await fetch(endpoint, {
           method: "POST",
           signal: abortControllersRef.current[writer.id].signal,
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            providerConfig: {
+              id: provider.id,
+              name: provider.name,
+              apiBase: provider.apiBase,
+              apiKey: provider.apiKey,
+            },
+          }),
         });
 
         if (!response.ok) throw new Error(`Stream failed (${response.status})`);
@@ -197,9 +230,27 @@ export default function ProjectPage() {
   };
 
   const handleReview = async () => {
+    const reviewer = agents.find((a) => a.role === "reviewer");
+    if (!reviewer) return;
+
+    const provider = providers.find((p) => p.id === reviewer.providerId);
+    if (!provider) {
+      console.error("No provider configured for reviewer");
+      return;
+    }
+
     try {
       const res = await fetch(`/api/projects/${projectId}/review`, {
         method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          providerConfig: {
+            id: provider.id,
+            name: provider.name,
+            apiBase: provider.apiBase,
+            apiKey: provider.apiKey,
+          },
+        }),
       });
       if (!res.ok) throw new Error("Review failed");
       await fetchProject();

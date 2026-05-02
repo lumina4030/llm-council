@@ -1,5 +1,5 @@
 import { create } from "zustand";
-import type { Project, Agent, Document, Review, WriterProgress, ProjectState } from "@/types";
+import type { Project, Agent, Document, Review, WriterProgress, ProjectState, Provider } from "@/types";
 
 const initialState = {
   project: null,
@@ -8,6 +8,7 @@ const initialState = {
   review: null,
   isGenerating: false,
   writerProgress: {},
+  providers: [],
 };
 
 export const useProjectStore = create<ProjectState>((set) => ({
@@ -39,4 +40,21 @@ export const useProjectStore = create<ProjectState>((set) => ({
     })),
 
   reset: () => set(initialState),
+
+  addProvider: (provider) =>
+    set((state) => ({
+      providers: [...state.providers, provider],
+    })),
+
+  removeProvider: (id) =>
+    set((state) => ({
+      providers: state.providers.filter((p) => p.id !== id),
+    })),
+
+  updateProvider: (id, updates) =>
+    set((state) => ({
+      providers: state.providers.map((p) =>
+        p.id === id ? { ...p, ...updates } : p
+      ),
+    })),
 }));

@@ -2,15 +2,7 @@
 
 import { Card } from "@heroui/react";
 import type { Agent } from "@/types";
-
-const MODEL_OPTIONS = [
-  { key: "gpt-4o", label: "GPT-4o" },
-  { key: "gpt-4o-mini", label: "GPT-4o Mini" },
-  { key: "claude-3-5-sonnet-20241022", label: "Claude 3.5 Sonnet" },
-  { key: "claude-3-opus-20240229", label: "Claude 3 Opus" },
-  { key: "gemini-2.0-flash", label: "Gemini 2.0 Flash" },
-  { key: "gemini-1.5-pro", label: "Gemini 1.5 Pro" },
-];
+import { useProjectStore } from "@/store/projectStore";
 
 interface AgentConfiguratorProps {
   projectId: string;
@@ -20,8 +12,15 @@ interface AgentConfiguratorProps {
 }
 
 export function AgentConfigurator({ agents, disabled }: AgentConfiguratorProps) {
+  const { providers } = useProjectStore();
   const writers = agents.filter((a) => a.role === "writer");
   const reviewers = agents.filter((a) => a.role === "reviewer");
+
+  const getProviderName = (providerId?: string) => {
+    if (!providerId) return "No provider";
+    const provider = providers.find((p) => p.id === providerId);
+    return provider?.name || "Unknown provider";
+  };
 
   return (
     <div className="space-y-4">
@@ -42,15 +41,13 @@ export function AgentConfigurator({ agents, disabled }: AgentConfiguratorProps) 
                 🤖
               </span>
               <span className="flex-1 font-medium text-sm">{agent.name}</span>
-              <select
-                value={agent.model}
-                disabled
-                className="w-36 px-2 py-1.5 border border-gray-300 dark:border-gray-600 rounded-lg dark:bg-gray-900/50 text-xs focus:ring-2 focus:ring-purple-500/30 transition-all"
-              >
-                {MODEL_OPTIONS.map((m) => (
-                  <option key={m.key} value={m.key}>{m.label}</option>
-                ))}
-              </select>
+              <div className="text-right">
+                <span className="text-xs font-medium text-purple-600 dark:text-purple-400">
+                  {getProviderName(agent.providerId)}
+                </span>
+                <br />
+                <code className="text-xs text-default-500">{agent.model || "no model"}</code>
+              </div>
             </div>
           ))}
         </div>
@@ -73,15 +70,13 @@ export function AgentConfigurator({ agents, disabled }: AgentConfiguratorProps) 
                 🔍
               </span>
               <span className="flex-1 font-medium text-sm">{agent.name}</span>
-              <select
-                value={agent.model}
-                disabled
-                className="w-36 px-2 py-1.5 border border-gray-300 dark:border-gray-600 rounded-lg dark:bg-gray-900/50 text-xs focus:ring-2 focus:ring-green-500/30 transition-all"
-              >
-                {MODEL_OPTIONS.map((m) => (
-                  <option key={m.key} value={m.key}>{m.label}</option>
-                ))}
-              </select>
+              <div className="text-right">
+                <span className="text-xs font-medium text-green-600 dark:text-green-400">
+                  {getProviderName(agent.providerId)}
+                </span>
+                <br />
+                <code className="text-xs text-default-500">{agent.model || "no model"}</code>
+              </div>
             </div>
           ))}
         </div>

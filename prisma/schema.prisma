@@ -31,6 +31,7 @@ model Agent {
   name      String
   role      String
   model     String
+  providerId String?
 
   documents Document[]
 

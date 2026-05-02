@@ -1,11 +1,12 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { streamText } from "ai";
-import { getProviderModel } from "@/lib/ai/providers";
+import { getModelForProvider } from "@/lib/ai/providers";
 import {
   SYSTEM_PROMPT_WRITER,
   buildWriterUserPrompt,
 } from "@/lib/ai/prompts";
+import type { ProviderConfig } from "@/lib/ai/providers";
 
 export async function POST(
   req: NextRequest,
@@ -13,6 +14,8 @@ export async function POST(
 ) {
   try {
     const { id: projectId, agentId } = await params;
+    const body = await req.json().catch(() => ({}));
+    const providerConfig: ProviderConfig | undefined = body.providerConfig;
 
     const project = await prisma.project.findUnique({
       where: { id: projectId },
@@ -45,8 +48,15 @@ export async function POST(
       data: { status: "running" },
     });
 
+    let model;
+    if (providerConfig) {
+      model = getModelForProvider(providerConfig, agent.model);
+    } else {
+      throw new Error("No provider configuration provided");
+    }
+
     const result = await streamText({
-      model: getProviderModel(agent.model),
+      model,
       system: SYSTEM_PROMPT_WRITER,
       prompt: buildWriterUserPrompt(project.idea, project.docType as "prd" | "spec"),
     });
